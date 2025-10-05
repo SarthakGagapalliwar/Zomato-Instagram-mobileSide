@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 const saveSchema = new mongoose.Schema({
     actor: {
         type: mongoose.Schema.Types.ObjectId,
-        refPath: "actorModel",
+        refPath: "actorType",
         required: true
     },
-    actorModel: {
+    actorType: {
         type: String,
         enum: ["user", "foodPartner"],
         required: true
@@ -20,7 +20,7 @@ const saveSchema = new mongoose.Schema({
     timestamps: true
 });
 
-saveSchema.index({ actor: 1, actorModel: 1, food: 1 }, { unique: true });
+saveSchema.index({ actor: 1, actorType: 1, food: 1 }, { unique: true });
 
 const saveModel = mongoose.model("save", saveSchema);
 

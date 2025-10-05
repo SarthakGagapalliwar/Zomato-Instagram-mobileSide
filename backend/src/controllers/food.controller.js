@@ -39,8 +39,8 @@ async function getFoodItems(req, res) {
 
         const [foods, likedDocs, savedDocs] = await Promise.all([
             foodModel.find({}).lean(),
-            account ? likeModel.find({ actor: account.id, actorModel: account.type }).select('food').lean() : [],
-            account ? saveModel.find({ actor: account.id, actorModel: account.type }).select('food').lean() : []
+            account ? likeModel.find({ actor: account.id, actorType: account.type }).select('food').lean() : [],
+            account ? saveModel.find({ actor: account.id, actorType: account.type }).select('food').lean() : []
         ]);
 
         const likedSet = new Set((likedDocs ?? []).map((doc) => doc.food.toString()));
@@ -80,14 +80,14 @@ async function likeFoodCountControler(req, res) {
 
         const isAlreadyLiked = await likeModel.findOne({
             actor: account.id,
-            actorModel: account.type,
+            actorType: account.type,
             food: foodId
         });
 
         if (isAlreadyLiked) {
             await likeModel.deleteOne({
                 actor: account.id,
-                actorModel: account.type,
+                actorType: account.type,
                 food: foodId
             });
 
@@ -106,7 +106,7 @@ async function likeFoodCountControler(req, res) {
 
         await likeModel.create({
             actor: account.id,
-            actorModel: account.type,
+            actorType: account.type,
             food: foodId
         });
 
@@ -144,14 +144,14 @@ async function saveFood(req, res) {
 
         const isAlreadySaved = await saveModel.findOne({
             actor: account.id,
-            actorModel: account.type,
+            actorType: account.type,
             food: foodId
         });
 
         if (isAlreadySaved) {
             await saveModel.deleteOne({
                 actor: account.id,
-                actorModel: account.type,
+                actorType: account.type,
                 food: foodId
             });
 
@@ -170,7 +170,7 @@ async function saveFood(req, res) {
 
         await saveModel.create({
             actor: account.id,
-            actorModel: account.type,
+            actorType: account.type,
             food: foodId
         });
 
@@ -194,9 +194,66 @@ async function saveFood(req, res) {
     }
 }
 
+async function getSavedFoodItems(req, res) {
+    try {
+        const account = req.account ?? (req.user ? { id: req.user._id, type: "user" } : req.foodPartner ? { id: req.foodPartner._id, type: "foodPartner" } : null);
+
+        if (!account) {
+            return res.status(401).json({
+                message: "Authentication required"
+            });
+        }
+
+        const savedDocs = await saveModel.find({
+            actor: account.id,
+            actorType: account.type
+        }).select('food').lean();
+
+        const foodIds = savedDocs.map((doc) => doc.food).filter(Boolean);
+
+        if (foodIds.length === 0) {
+            return res.status(200).json({
+                message: "No saved food items",
+                foodItems: []
+            });
+        }
+
+        const [foods, likedDocs] = await Promise.all([
+            foodModel.find({ _id: { $in: foodIds } }).lean(),
+            likeModel.find({
+                actor: account.id,
+                actorType: account.type,
+                food: { $in: foodIds }
+            }).select('food').lean()
+        ]);
+
+        const likedSet = new Set((likedDocs ?? []).map((doc) => doc.food.toString()));
+
+        const foodItems = foods.map((food) => ({
+            ...food,
+            likeCount: food.likeCount ?? 0,
+            savesCount: food.savesCount ?? 0,
+            liked: likedSet.has(food._id.toString()),
+            saved: true
+        }));
+
+        return res.status(200).json({
+            message: "Saved food items fetched successfully",
+            foodItems
+        });
+    } catch (error) {
+        console.error('Failed to fetch saved food items:', error);
+        return res.status(500).json({
+            message: "Unable to fetch saved food items",
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
     createFood,
     getFoodItems,
     likeFoodCountControler,
-    saveFood
+    saveFood,
+    getSavedFoodItems
 };

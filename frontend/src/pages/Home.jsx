@@ -13,17 +13,23 @@ const Home = () => {
         withCredentials: true,
       })
       .then((response) => {
-        const normalised = (response.data.foodItems ?? []).map((item) => ({
-          likeCount: 0,
-          savesCount: 0,
-          liked: false,
-          saved: false,
-          ...item,
-          likeCount: item.likeCount ?? 0,
-          savesCount: item.savesCount ?? 0,
-          liked: item.liked ?? false,
-          saved: item.saved ?? false,
-        }));
+        const normalised = (response.data.foodItems ?? []).map((item) => {
+          const {
+            likeCount = 0,
+            savesCount = 0,
+            liked = false,
+            saved = false,
+            ...rest
+          } = item ?? {};
+
+          return {
+            ...rest,
+            likeCount,
+            savesCount,
+            liked,
+            saved,
+          };
+        });
         setVideo(normalised);
       })
       .catch((error) => {
