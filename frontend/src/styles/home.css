@@ -1,17 +1,24 @@
+:root {
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --reel-bottom-nav-height: calc(72px + var(--safe-area-bottom));
+}
+
 .reel-page {
-  height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   background: radial-gradient(
       120% 120% at 50% 0%,
-      rgba(99, 102, 241, 0.12),
-      transparent 55%
+      rgba(33, 33, 33, 0.45),
+      transparent 60%
     ),
-    var(--color-background);
-  color: var(--color-text-primary);
+    #04070d;
+  color: #f5f7fa;
+  position: relative;
+  padding-bottom: var(--reel-bottom-nav-height);
 }
 
 .reel-feed {
-  height: 100%;
+  height: calc(100dvh - var(--reel-bottom-nav-height));
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
@@ -24,12 +31,17 @@
 
 .reel-card {
   position: relative;
-  height: 100vh;
+  height: calc(100dvh - var(--reel-bottom-nav-height) - 3rem);
   scroll-snap-align: start;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #000;
+  border-radius: 32px;
+  overflow: hidden;
+  margin: clamp(1.5rem, 4vw, 2.25rem) clamp(1.1rem, 3vw, 1.75rem)
+    clamp(2rem, 4vw, 2.8rem);
+  box-shadow: 0 24px 48px rgba(5, 5, 5, 0.4);
 }
 
 .reel-video {
@@ -38,12 +50,29 @@
   object-fit: cover;
 }
 
+.reel-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  background: linear-gradient(
+    160deg,
+    rgba(66, 66, 74, 0.6),
+    rgba(15, 15, 20, 0.95)
+  );
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .reel-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: clamp(1.75rem, 4vw, 2.75rem);
   pointer-events: none;
 }
@@ -69,7 +98,7 @@
   display: grid;
   gap: 1.1rem;
   pointer-events: auto;
-  max-width: 92%;
+  max-width: min(82%, 360px);
 }
 
 .reel-description {
@@ -88,20 +117,16 @@
 
 .reel-cta {
   justify-self: start;
-  padding: 0.95rem 2rem;
-  border-radius: 999px;
+  padding: 0.95rem 2.2rem;
+  border-radius: 28px;
   border: none;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.01em;
-  color: #ffffff;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent),
-    var(--color-accent-hover)
-  );
-  box-shadow: 0 8px 24px -8px rgba(99, 102, 241, 0.55),
-    0 2px 8px rgba(0, 0, 0, 0.18);
+  color: #fefefe;
+  background: linear-gradient(135deg, #702c2f, #922b35);
+  box-shadow: 0 8px 24px -8px rgba(146, 43, 53, 0.6),
+    0 2px 12px rgba(0, 0, 0, 0.3);
   transition: transform var(--transition-base),
     box-shadow var(--transition-base);
   cursor: pointer;
@@ -109,17 +134,146 @@
 
 .reel-cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px -10px rgba(99, 102, 241, 0.65),
-    0 4px 12px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 16px 36px -12px rgba(146, 43, 53, 0.7),
+    0 6px 18px rgba(0, 0, 0, 0.28);
 }
 
 .reel-cta:active {
   transform: translateY(0);
 }
 
+.reel-header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  font-size: clamp(1.25rem, 3.2vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-top: 0.5rem;
+}
+
+.reel-body {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.75rem;
+  align-items: flex-end;
+  position: relative;
+  z-index: 3;
+}
+
+.reel-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  pointer-events: auto;
+  min-width: 120px;
+}
+
+.reel-action-btn {
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(15, 15, 18, 0.42);
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: auto;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: transform 160ms ease, background 200ms ease,
+    border-color 200ms ease;
+}
+
+.reel-action-btn--active {
+  background: rgba(172, 56, 57, 0.75);
+  border-color: rgba(255, 94, 112, 0.55);
+}
+
+.reel-action-btn--static {
+  pointer-events: none;
+  cursor: default;
+}
+
+.reel-action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.reel-action-btn:active {
+  transform: translateY(0);
+}
+
+.reel-action-label {
+  font-size: 0.8rem;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+
+.reel-action-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.reel-action-icon--filled {
+  color: #ff4f68;
+}
+
+.reel-empty {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  height: calc(100dvh - var(--reel-bottom-nav-height));
+  padding: 0 2rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.reel-empty > div {
+  max-width: 360px;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.reel-empty h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.reel-empty p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.reel-hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--reel-bottom-nav-height) + 0.5rem);
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 3rem));
+  background: rgba(34, 35, 45, 0.82);
+  color: rgba(255, 255, 255, 0.88);
+  padding: 0.65rem 1.15rem;
+  border-radius: 18px;
+  font-size: 0.82rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  z-index: 9;
+}
+
+@media (max-width: 768px) {
+  .reel-card {
+    height: calc(100dvh - var(--reel-bottom-nav-height) - 1.75rem);
+    margin: 1.25rem 1rem 2rem;
+  }
+}
+
 @media (max-width: 640px) {
   .reel-overlay {
-    padding: 1.5rem 1.25rem;
+    padding: clamp(1.25rem, 6vw, 1.75rem) clamp(1rem, 5vw, 1.5rem) 1.75rem;
   }
 
   .reel-description {
@@ -130,5 +284,26 @@
     width: 100%;
     text-align: center;
     padding: 1rem 1.5rem;
+  }
+
+  .reel-card {
+    margin: 0;
+    border-radius: 0;
+    height: calc(100dvh - var(--reel-bottom-nav-height));
+    box-shadow: none;
+  }
+
+  .reel-actions {
+    min-width: auto;
+    gap: 0.85rem;
+  }
+
+  .reel-action-btn {
+    padding: 0.55rem 0.85rem;
+  }
+
+  .reel-hint {
+    width: calc(100% - 2.5rem);
+    bottom: calc(var(--reel-bottom-nav-height) + 0.75rem);
   }
 }

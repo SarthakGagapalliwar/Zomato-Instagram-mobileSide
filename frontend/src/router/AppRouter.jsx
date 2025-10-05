@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
+import Saved from "../pages/Saved";
 import UserRegister from "../pages/UserRegister";
 import UserLogin from "../pages/UserLogin";
 import FoodPartnerRegister from "../pages/FoodPartnerRegister";
@@ -12,6 +13,7 @@ const AppRouter = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/saved" element={<Saved />} />
         <Route path="/user/register" element={<UserRegister />} />
         <Route path="/user/login" element={<UserLogin />} />
         <Route

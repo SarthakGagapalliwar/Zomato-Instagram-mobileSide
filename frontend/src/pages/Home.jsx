@@ -1,57 +1,115 @@
 import { useEffect, useState } from "react";
-import "../styles/home.css";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import ReelCard from "../components/ReelCard.jsx";
+import BottomNav from "../components/BottomNav.jsx";
+import "../styles/home.css";
+
+const fallbackReels = [
+  {
+    _id: "demo-1",
+    title: "Video",
+    description:
+      "Discover today’s seasonal menu crafted by our favourite partner chefs.",
+    video: "",
+    likes: 23,
+    saves: 23,
+    comments: 45,
+    foodpartner: "demo-store",
+  },
+  {
+    _id: "demo-2",
+    title: "Video",
+    description:
+      "Experience a new street-food inspired special with same-day delivery.",
+    video: "",
+    likes: 18,
+    saves: 12,
+    comments: 31,
+    foodpartner: "demo-store",
+  },
+];
 
 const Home = () => {
-  const [video, setVideo] = useState([]);
+  const [reels, setReels] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [usedFallback, setUsedFallback] = useState(false);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/food", {
-        withCredentials: true,
-      })
-      .then((response) => {
-        setVideo(response.data.foodItems);
-      })
-      .catch((error) => {
-        console.error("Error fetching food data:", error);
-      });
+    let isMounted = true;
+
+    const fetchReels = async () => {
+      setIsLoading(true);
+      setError(null);
+      setUsedFallback(false);
+
+      try {
+        const response = await axios.get("http://localhost:3000/api/food", {
+          withCredentials: true,
+        });
+
+        if (!isMounted) return;
+
+        const items = response?.data?.foodItems ?? [];
+        if (items.length === 0) {
+          setReels(fallbackReels);
+          setUsedFallback(true);
+        } else {
+          setReels(items);
+        }
+      } catch (requestError) {
+        if (!isMounted) return;
+        console.error("Error fetching food data:", requestError);
+        setError(
+          "We couldn’t reach the server, showing a preview feed instead."
+        );
+        setReels(fallbackReels);
+        setUsedFallback(true);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchReels();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
     <main className="reel-page">
       <section className="reel-feed" aria-label="Featured store videos">
-        {video.map((reel) => (
-          <article key={reel._id} className="reel-card">
-            <video
-              className="reel-video"
-              // ref={setVideoRef(item._id)}
-              src={reel.video}
-              muted
-              autoPlay
-              playsInline
-              loop
-              preload="metadata"
-            />
-            <div className="reel-overlay">
-              <div className="reel-meta">
-                <p className="reel-description">{reel.description}</p>
-                {reel.foodpartner && (
-                  <Link
-                    type="button"
-                    className="reel-cta"
-                    to={"/food-partner/" + reel.foodpartner}
-                    aria-label="Visit store"
-                  >
-                    Visit store
-                  </Link>
-                )}
-              </div>
+        {isLoading ? (
+          <div className="reel-empty">
+            <div>
+              <h2>Loading your personalised feed…</h2>
+              <p>We’re fetching the latest drops from partner kitchens.</p>
             </div>
-          </article>
-        ))}
+          </div>
+        ) : reels.length ? (
+          reels.map((reel, index) => (
+            <ReelCard key={reel?._id ?? `reel-${index}`} reel={reel} />
+          ))
+        ) : (
+          <div className="reel-empty">
+            <div>
+              <h2>No videos yet</h2>
+              <p>Check back later or explore your saved stores below.</p>
+            </div>
+          </div>
+        )}
       </section>
+
+      {(error || usedFallback) && !isLoading && (
+        <div className="reel-hint" role="status">
+          {error || "Showing sample content until new drops arrive."}
+        </div>
+      )}
+
+      <BottomNav />
     </main>
   );
 };
