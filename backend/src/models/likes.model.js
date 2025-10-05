@@ -1,20 +1,27 @@
 const mongoose = require("mongoose");
 
 const likeSchme = new mongoose.Schema({
-    user:{
+    actor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',
-        required:true
+        refPath: 'actorModel',
+        required: true
     },
-    food:{
+    actorModel: {
+        type: String,
+        enum: ["user", "foodPartner"],
+        required: true
+    },
+    food: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'food',
-        required:true
+        ref: 'food',
+        required: true
     }
 
-},{
-    timeseries:true
+}, {
+    timestamps: true
 })
 
-const Like = mongoose.model('like',likeSchme);
-module.exports =Like;
+likeSchme.index({ actor: 1, actorModel: 1, food: 1 }, { unique: true });
+
+const Like = mongoose.model('like', likeSchme);
+module.exports = Like;

@@ -1,9 +1,0 @@
-#root {
-  min-height: 100vh;
-  background: #04070d;
-}
-
-main.reel-page {
-  max-width: 480px;
-  margin: 0 auto;
-}

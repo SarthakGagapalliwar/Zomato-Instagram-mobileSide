@@ -1,20 +1,27 @@
-const  mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
-const saveSchema= new mongoose.Schema({
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'user',
-        required:true 
+const saveSchema = new mongoose.Schema({
+    actor: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: "actorModel",
+        required: true
     },
-    food:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'food',
-        required:true
+    actorModel: {
+        type: String,
+        enum: ["user", "foodPartner"],
+        required: true
+    },
+    food: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "food",
+        required: true
     }
-},{
-    timeseries:true
-})
+}, {
+    timestamps: true
+});
 
-const saveModel = mongoose.model('save',saveSchema);
+saveSchema.index({ actor: 1, actorModel: 1, food: 1 }, { unique: true });
+
+const saveModel = mongoose.model("save", saveSchema);
 
 module.exports = saveModel;

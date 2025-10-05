@@ -1,72 +1,45 @@
-import { NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "../styles/bottom-nav.css";
 
-const iconProps = {
-  width: 28,
-  height: 28,
-  viewBox: "0 0 24 24",
-  strokeWidth: 1.6,
-  fill: "none",
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-};
-
-const HomeIcon = ({ active }) => (
-  <svg
-    {...iconProps}
-    aria-hidden="true"
-    stroke={active ? "currentColor" : "currentColor"}
-    className={
-      active ? "bottom-nav__icon bottom-nav__icon--active" : "bottom-nav__icon"
-    }
-  >
-    <path d="M3 10.5 12 3l9 7.5" />
-    <path d="M5.5 9.5V20h13V9.5" />
-  </svg>
-);
-
-const BookmarkIcon = ({ active }) => (
-  <svg
-    {...iconProps}
-    aria-hidden="true"
-    stroke={active ? "currentColor" : "currentColor"}
-    className={
-      active ? "bottom-nav__icon bottom-nav__icon--active" : "bottom-nav__icon"
-    }
-  >
-    <path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1z" />
-  </svg>
-);
-
 const BottomNav = () => {
+  const location = useLocation();
+
   return (
-    <nav className="bottom-nav" aria-label="Primary navigation">
-      <NavLink
+    <nav className="bottom-nav">
+      <Link
         to="/"
-        className={({ isActive }) =>
-          `bottom-nav__item${isActive ? " bottom-nav__item--active" : ""}`
-        }
+        className={`nav-item ${location.pathname === "/" ? "active" : ""}`}
       >
-        {({ isActive }) => (
-          <>
-            <HomeIcon active={isActive} />
-            <span className="bottom-nav__label">Home</span>
-          </>
-        )}
-      </NavLink>
-      <NavLink
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        <span>home</span>
+      </Link>
+
+      <Link
         to="/saved"
-        className={({ isActive }) =>
-          `bottom-nav__item${isActive ? " bottom-nav__item--active" : ""}`
-        }
+        className={`nav-item ${location.pathname === "/saved" ? "active" : ""}`}
       >
-        {({ isActive }) => (
-          <>
-            <BookmarkIcon active={isActive} />
-            <span className="bottom-nav__label">Saved</span>
-          </>
-        )}
-      </NavLink>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+        </svg>
+        <span>saved</span>
+      </Link>
     </nav>
   );
 };

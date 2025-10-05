@@ -5,7 +5,7 @@ const foodController = require("../controllers/food.controller")
 const multer = require('multer') // to read the file like video image and all
 
 const upload = multer({
-    storage:multer.memoryStorage(),
+    storage: multer.memoryStorage(),
 })
 
 /* POST /api/food/ [protected] */
@@ -17,18 +17,18 @@ router.post('/',
 
 
 /* GET /api/food [protected]*/  //users
-router.get("/",authMiddleware.authUserMiddleware,
+router.get("/", authMiddleware.authAccountMiddleware,
     foodController.getFoodItems
 )
-  
+
 
 router.post('/like',
-    authMiddleware.authUserMiddleware,
+    authMiddleware.authAccountMiddleware,
     foodController.likeFoodCountControler)
 
 router.post('/save',
-    authMiddleware.authUserMiddleware,
+    authMiddleware.authAccountMiddleware,
     foodController.saveFood
 )
-    
-module.exports=router;
+
+module.exports = router;
